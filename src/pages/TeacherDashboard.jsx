@@ -1,4 +1,4 @@
-// src/pages/TeacherDashboard.jsx
+
 import Sidebar from '../components/Sidebar';
 import { Outlet } from 'react-router-dom';
 

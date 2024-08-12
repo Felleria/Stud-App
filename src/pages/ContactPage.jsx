@@ -58,9 +58,9 @@ const ContactPage = () => {
             <div className="bg-gray-800 p-8 rounded-lg shadow-lg text-gray-300 relative z-10">
               <h2 className="text-2xl font-bold mb-4 text-pink-400">Our Office</h2>
               <p>
-                1234 Elm Street, Suite 567<br />
-                Your City, Your Country<br />
-                Phone: +123 456 7890
+                Ngong Road, <br />
+                Nairobi, Kenya<br />
+                Phone: +254 785 679 490 
               </p>
             </div>
             <div className="bg-gray-800 p-8 rounded-lg shadow-lg text-gray-300 relative z-10">

@@ -31,6 +31,7 @@ function App() {
         <Route path="/about" element={<AboutPage />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/login" element={<LoginPage login={login} />} />
+        <Route path="student/*" element={<StudentDashboard />} />
 
         {/* Protected Routes */}   
         {isAuthenticated ? (

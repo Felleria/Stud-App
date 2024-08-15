@@ -32,6 +32,9 @@ function App() {
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/login" element={<LoginPage login={login} />} />
         <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="teacher/*" element={<TeacherDashboard />} />
+        <Route path="student/*" element={<StudentDashboard />} />
         
         {/* Protected Routes */}   
         {isAuthenticated ? (

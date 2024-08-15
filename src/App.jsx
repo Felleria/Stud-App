@@ -1,3 +1,4 @@
+
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useState } from 'react';
 import HomePage from './pages/HomePage';
@@ -35,7 +36,7 @@ function App() {
         {/* Protected Routes */}   
         {isAuthenticated ? (
           <>
-            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="admin/*" element={<AdminDashboard />} />
             <Route path="teacher/*" element={<TeacherDashboard />} />
             <Route path="student/*" element={<StudentDashboard />} />
           </>
@@ -47,5 +48,4 @@ function App() {
   );
 }
 
-export default App; 
-
+export default App;

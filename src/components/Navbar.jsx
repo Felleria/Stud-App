@@ -78,14 +78,14 @@ export default Navbar; */
 
 
 import { Link } from 'react-router-dom';
-import { HomeIcon, InformationCircleIcon, PhoneIcon, UserIcon, ArrowRightOnRectangleIcon, ArrowLeftOnRectangleIcon } from '@heroicons/react/24/outline';
+import { HomeIcon, InformationCircleIcon, PhoneIcon, ArrowRightOnRectangleIcon, ArrowLeftOnRectangleIcon } from '@heroicons/react/24/outline';
 
 const Navbar = ({ isAuthenticated, userRole, logout }) => {
   return (
     <nav className="bg-purple-700 text-white p-4 sticky top-0 z-10">
       <div className="container mx-auto flex justify-between items-center">
         <Link to="/" className="text-lg font-bold flex items-center">
-          <HomeIcon className="h-6 w-6 mr-2 text-white" />
+          <img src="/logo.png" alt="Student Sphere Logo" className="h-10 w-10 mr-2 rounded-full shadow-lg" />
           Student Sphere
         </Link>
         <div className="flex space-x-4 items-center">
@@ -140,3 +140,4 @@ const Navbar = ({ isAuthenticated, userRole, logout }) => {
 };
 
 export default Navbar;
+

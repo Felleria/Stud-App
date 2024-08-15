@@ -8,17 +8,17 @@ const ManageStudents = () => {
 
   useEffect(() => {
     // Fetch the number of students
-    fetch('/api/teacher/students/count')
+    fetch('http://127.0.0.1:5555/students')
       .then(response => response.json())
       .then(data => setStudents(data.count));
 
     // Fetch the number of courses
-    fetch('/api/teacher/courses/count')
+    fetch('http://127.0.0.1:5555/courses')
       .then(response => response.json())
       .then(data => setCourses(data.count));
 
     // Fetch grades summary
-    fetch('/api/teacher/grades/summary')
+    fetch('')
       .then(response => response.json())
       .then(data => setGrades(data));
 

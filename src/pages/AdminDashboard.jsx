@@ -49,9 +49,6 @@ const AdminDashboard = () => {
               <Link to="manage-classes" className="hover:text-gray-300">Manage Classes</Link>
             </li>
             <li>
-              <Link to="assigned-teachers" className="hover:text-gray-300">Assigned Teachers</Link>
-            </li>
-            <li>
               <Link to="reports" className="hover:text-gray-300">Reports</Link>
             </li>
           </ul>

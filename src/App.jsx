@@ -31,12 +31,11 @@ function App() {
         <Route path="/about" element={<AboutPage />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/login" element={<LoginPage login={login} />} />
-        <Route path="student/*" element={<StudentDashboard />} />
 
         {/* Protected Routes */}   
         {isAuthenticated ? (
           <>
-            <Route path="admin/*" element={<AdminDashboard />} />
+            <Route path="/admin" element={<AdminDashboard />} />
             <Route path="teacher/*" element={<TeacherDashboard />} />
             <Route path="student/*" element={<StudentDashboard />} />
           </>
@@ -49,3 +48,4 @@ function App() {
 }
 
 export default App; 
+

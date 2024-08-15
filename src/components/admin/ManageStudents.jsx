@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import emailjs from 'emailjs-com'; // Import EmailJS
 import { TailSpin } from 'react-loader-spinner';
 import { FaEdit, FaSave, FaTrashAlt } from 'react-icons/fa'; // Import the icons
 
@@ -51,10 +52,36 @@ const ManageStudents = () => {
       )
     );
     setEditingStudent(null);
+
+    // Send email notification to the student
+    if (updatedStudent.email) {
+      sendEmailNotification(updatedStudent.email, updatedStudent.name);
+    }
   };
 
   const handleCancelEdit = () => {
     setEditingStudent(null);
+  };
+
+  // Function to send email using EmailJS
+  const sendEmailNotification = (email, name) => {
+    const serviceId = 'your_service_id';
+    const templateId = 'your_template_id';
+    const userId = 'your_user_id';
+
+    const templateParams = {
+      to_name: name,
+      to_email: email,
+      message: `Dear ${name}, you have been successfully added to the Study Sphere platform as a student. Welcome aboard!`,
+    };
+
+    emailjs.send(serviceId, templateId, templateParams, userId)
+      .then((response) => {
+        console.log('Email sent successfully!', response.status, response.text);
+      })
+      .catch((error) => {
+        console.error('Failed to send email...', error);
+      });
   };
 
   return (

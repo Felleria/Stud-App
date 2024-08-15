@@ -1,177 +1,23 @@
-/*import React, { useState, useEffect } from 'react';
-
-const ManageTeachers = () => {
-  const [teachers, setTeachers] = useState([]);
-  const [editingTeacher, setEditingTeacher] = useState(null);
-
-  useEffect(() => {
-    fetch('http://127.0.0.1:5555/teachers')
-      .then(response => response.json())
-      .then(data => setTeachers(data));
-  }, []);
-
-  const handleAddTeacher = () => {
-    const newTeacher = {
-      id: Date.now(),
-      name: '',
-      subject: '',
-      email: '',
-    };
-    setTeachers([...teachers, newTeacher]);
-    setEditingTeacher(newTeacher);
-  };
-
-  const handleEditTeacher = (teacher) => {
-    setEditingTeacher(teacher);
-  };
-
-  const handleDeleteTeacher = (teacherId) => {
-    setTeachers(teachers.filter(teacher => teacher.id !== teacherId));
-  };
-
-  const handleSaveTeacher = (teacherId, updatedTeacher) => {
-    setTeachers(
-      teachers.map(teacher =>
-        teacher.id === teacherId ? updatedTeacher : teacher
-      )
-    );
-    setEditingTeacher(null);
-  };
-
-  const handleCancelEdit = () => {
-    setEditingTeacher(null);
-  };
-
-  return (
-    <div className="max-w-6xl mx-auto p-4 bg-white rounded-lg shadow-lg">
-      <h1 className="text-3xl font-bold mb-6 text-center">Manage Teachers</h1>
-      <div className="mb-4">
-        <button
-          onClick={handleAddTeacher}
-          className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600"
-        >
-          Add Teacher
-        </button>
-      </div>
-      <table className="min-w-full bg-white border border-gray-300 rounded-lg">
-        <thead>
-          <tr>
-            <th className="py-2 px-4 border-b">ID</th>
-            <th className="py-2 px-4 border-b">Name</th>
-            <th className="py-2 px-4 border-b">Subject</th>
-            <th className="py-2 px-4 border-b">Email</th>
-            <th className="py-2 px-4 border-b">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {teachers.map(teacher => (
-            <tr key={teacher.id} className="border-t">
-              <td className="py-2 px-4 border-r">{teacher.id}</td>
-              <td className="py-2 px-4 border-r">
-                {editingTeacher?.id === teacher.id ? (
-                  <input
-                    type="text"
-                    value={editingTeacher.name}
-                    onChange={(e) =>
-                      setEditingTeacher({ ...editingTeacher, name: e.target.value })
-                    }
-                    className="w-full p-2 border border-gray-300 rounded-lg"
-                  />
-                ) : (
-                  teacher.name
-                )}
-              </td>
-              <td className="py-2 px-4 border-r">
-                {editingTeacher?.id === teacher.id ? (
-                  <input
-                    type="text"
-                    value={editingTeacher.subject}
-                    onChange={(e) =>
-                      setEditingTeacher({ ...editingTeacher, subject: e.target.value })
-                    }
-                    className="w-full p-2 border border-gray-300 rounded-lg"
-                  />
-                ) : (
-                  teacher.subject
-                )}
-              </td>
-              <td className="py-2 px-4 border-r">
-                {editingTeacher?.id === teacher.id ? (
-                  <input
-                    type="email"
-                    value={editingTeacher.email}
-                    onChange={(e) =>
-                      setEditingTeacher({ ...editingTeacher, email: e.target.value })
-                    }
-                    className="w-full p-2 border border-gray-300 rounded-lg"
-                  />
-                ) : (
-                  teacher.email
-                )}
-              </td>
-              <td className="py-2 px-4">
-                {editingTeacher?.id === teacher.id ? (
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={() => handleSaveTeacher(teacher.id, editingTeacher)}
-                      className="bg-green-500 text-white px-4 py-2 rounded-lg shadow hover:bg-green-600"
-                    >
-                      Save
-                    </button>
-                    <button
-                      onClick={handleCancelEdit}
-                      className="bg-gray-500 text-white px-4 py-2 rounded-lg shadow hover:bg-gray-600"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                ) : (
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={() => handleEditTeacher(teacher)}
-                      className="bg-yellow-500 text-white px-4 py-2 rounded-lg shadow hover:bg-yellow-600"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDeleteTeacher(teacher.id)}
-                      className="bg-red-500 text-white px-4 py-2 rounded-lg shadow hover:bg-red-600"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                )}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-};
-
-export default ManageTeachers;
-
-
-*/
-
 import React, { useState, useEffect } from 'react';
+import emailjs from 'emailjs-com'; // Import EmailJS
 import { TailSpin } from 'react-loader-spinner';
 import { FaEdit, FaSave, FaTrashAlt } from 'react-icons/fa'; // Import the icons
 
-const ManageTeachers = () => {
-  const [teachers, setTeachers] = useState([]);
-  const [editingTeacher, setEditingTeacher] = useState(null);
+const ManageStudents = () => {
+  const [students, setStudents] = useState([]);
+  const [editingStudent, setEditingStudent] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const fetchData = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/teachers');
+      const response = await fetch('http://127.0.0.1:5555/students');
       const data = await response.json();
-      setTeachers(data);
+      console.log(data); // Check the structure of the fetched data
+      setStudents(Array.isArray(data) ? data : []); // Ensure data is an array
     } catch (error) {
-      console.error('Error fetching teachers:', error);
+      console.error('Error fetching students:', error);
+      setStudents([]);
     } finally {
       setLoading(false);
     }
@@ -181,47 +27,72 @@ const ManageTeachers = () => {
     fetchData();
   }, []);
 
-  const handleAddTeacher = () => {
-    const newTeacher = {
+  const handleAddStudent = () => {
+    const newStudent = {
       id: Date.now(),
       name: '',
-      subject: '',
       email: '',
     };
-    setTeachers([...teachers, newTeacher]);
-    setEditingTeacher(newTeacher);
+    setStudents([...students, newStudent]);
+    setEditingStudent(newStudent);
   };
 
-  const handleEditTeacher = (teacher) => {
-    setEditingTeacher(teacher);
+  const handleEditStudent = (student) => {
+    setEditingStudent(student);
   };
 
-  const handleDeleteTeacher = (teacherId) => {
-    setTeachers(teachers.filter(teacher => teacher.id !== teacherId));
+  const handleDeleteStudent = (studentId) => {
+    setStudents(students.filter(student => student.id !== studentId));
   };
 
-  const handleSaveTeacher = (teacherId, updatedTeacher) => {
-    setTeachers(
-      teachers.map(teacher =>
-        teacher.id === teacherId ? updatedTeacher : teacher
+  const handleSaveStudent = (studentId, updatedStudent) => {
+    setStudents(
+      students.map(student =>
+        student.id === studentId ? updatedStudent : student
       )
     );
-    setEditingTeacher(null);
+    setEditingStudent(null);
+
+    // Send email notification to the student
+    if (updatedStudent.email) {
+      sendEmailNotification(updatedStudent.email, updatedStudent.name);
+    }
   };
 
   const handleCancelEdit = () => {
-    setEditingTeacher(null);
+    setEditingStudent(null);
+  };
+
+  // Function to send email using EmailJS
+  const sendEmailNotification = (email, name) => {
+    const serviceId = 'your_service_id';
+    const templateId = 'your_template_id';
+    const userId = 'your_user_id';
+
+    const templateParams = {
+      to_name: name,
+      to_email: email,
+      message: `Dear ${name}, you have been successfully added to the Study Sphere platform as a student. Welcome aboard!`,
+    };
+
+    emailjs.send(serviceId, templateId, templateParams, userId)
+      .then((response) => {
+        console.log('Email sent successfully!', response.status, response.text);
+      })
+      .catch((error) => {
+        console.error('Failed to send email...', error);
+      });
   };
 
   return (
     <div className="max-w-6xl mx-auto p-4 bg-white rounded-lg shadow-lg">
-      <h1 className="text-3xl font-bold mb-6 text-center">Manage Teachers</h1>
+      <h1 className="text-3xl font-bold mb-6 text-center">Manage Students</h1>
       <div className="mb-4">
         <button
-          onClick={handleAddTeacher}
+          onClick={handleAddStudent}
           className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600"
         >
-          Add Teacher
+          Add Student
         </button>
       </div>
       {loading ? (
@@ -234,62 +105,47 @@ const ManageTeachers = () => {
             <tr>
               <th className="py-2 px-4 border-b">ID</th>
               <th className="py-2 px-4 border-b">Name</th>
-              <th className="py-2 px-4 border-b">Subject</th>
               <th className="py-2 px-4 border-b">Email</th>
               <th className="py-2 px-4 border-b">Actions</th>
             </tr>
           </thead>
           <tbody>
-            {teachers.map(teacher => (
-              <tr key={teacher.id} className="border-t">
-                <td className="py-2 px-4 border-r">{teacher.id}</td>
+            {students.map(student => (
+              <tr key={student.id} className="border-t">
+                <td className="py-2 px-4 border-r">{student.id}</td>
                 <td className="py-2 px-4 border-r">
-                  {editingTeacher?.id === teacher.id ? (
+                  {editingStudent?.id === student.id ? (
                     <input
                       type="text"
-                      value={editingTeacher.name}
+                      value={editingStudent.name}
                       onChange={(e) =>
-                        setEditingTeacher({ ...editingTeacher, name: e.target.value })
+                        setEditingStudent({ ...editingStudent, name: e.target.value })
                       }
                       className="w-full p-2 border border-gray-300 rounded-lg"
                     />
                   ) : (
-                    teacher.name
+                    student.name
                   )}
                 </td>
                 <td className="py-2 px-4 border-r">
-                  {editingTeacher?.id === teacher.id ? (
-                    <input
-                      type="text"
-                      value={editingTeacher.subject}
-                      onChange={(e) =>
-                        setEditingTeacher({ ...editingTeacher, subject: e.target.value })
-                      }
-                      className="w-full p-2 border border-gray-300 rounded-lg"
-                    />
-                  ) : (
-                    teacher.subject
-                  )}
-                </td>
-                <td className="py-2 px-4 border-r">
-                  {editingTeacher?.id === teacher.id ? (
+                  {editingStudent?.id === student.id ? (
                     <input
                       type="email"
-                      value={editingTeacher.email}
+                      value={editingStudent.email}
                       onChange={(e) =>
-                        setEditingTeacher({ ...editingTeacher, email: e.target.value })
+                        setEditingStudent({ ...editingStudent, email: e.target.value })
                       }
                       className="w-full p-2 border border-gray-300 rounded-lg"
                     />
                   ) : (
-                    teacher.email
+                    student.email
                   )}
                 </td>
                 <td className="py-2 px-4">
-                  {editingTeacher?.id === teacher.id ? (
+                  {editingStudent?.id === student.id ? (
                     <div className="flex space-x-2">
                       <button
-                        onClick={() => handleSaveTeacher(teacher.id, editingTeacher)}
+                        onClick={() => handleSaveStudent(student.id, editingStudent)}
                         className="bg-green-500 text-white px-4 py-2 rounded-lg shadow hover:bg-green-600"
                       >
                         <FaSave />
@@ -304,13 +160,13 @@ const ManageTeachers = () => {
                   ) : (
                     <div className="flex space-x-2">
                       <button
-                        onClick={() => handleEditTeacher(teacher)}
+                        onClick={() => handleEditStudent(student)}
                         className="bg-yellow-500 text-white px-4 py-2 rounded-lg shadow hover:bg-yellow-600"
                       >
                         <FaEdit />
                       </button>
                       <button
-                        onClick={() => handleDeleteTeacher(teacher.id)}
+                        onClick={() => handleDeleteStudent(student.id)}
                         className="bg-red-500 text-white px-4 py-2 rounded-lg shadow hover:bg-red-600"
                       >
                         <FaTrashAlt />
@@ -327,4 +183,4 @@ const ManageTeachers = () => {
   );
 };
 
-export default ManageTeachers;
+export default ManageStudents;

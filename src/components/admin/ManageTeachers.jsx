@@ -1,23 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import emailjs from 'emailjs-com'; // Import EmailJS
+import emailjs from 'emailjs-com';
+import { FaEdit, FaSave, FaTrashAlt } from 'react-icons/fa';
 import { TailSpin } from 'react-loader-spinner';
-import { FaEdit, FaSave, FaTrashAlt } from 'react-icons/fa'; // Import the icons
 
-const ManageStudents = () => {
-  const [students, setStudents] = useState([]);
-  const [editingStudent, setEditingStudent] = useState(null);
+const ManageTeachers = () => {
+  const [teachers, setTeachers] = useState([]);
+  const [editingTeacher, setEditingTeacher] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [newTeacher, setNewTeacher] = useState({ name: '', user_id: '' });
 
+  // Fetch data from backend
   const fetchData = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
-      const response = await fetch('http://127.0.0.1:5555/students');
+      const response = await fetch('http://127.0.0.1:5555/teachers');
+      if (!response.ok) {
+        throw new Error(`Error ${response.status}: ${response.statusText}`);
+      }
       const data = await response.json();
-      console.log(data); // Check the structure of the fetched data
-      setStudents(Array.isArray(data) ? data : []); // Ensure data is an array
+      setTeachers(data.teachers || []);
     } catch (error) {
-      console.error('Error fetching students:', error);
-      setStudents([]);
+      console.error('Error fetching teachers:', error);
     } finally {
       setLoading(false);
     }
@@ -27,52 +30,103 @@ const ManageStudents = () => {
     fetchData();
   }, []);
 
-  const handleAddStudent = () => {
-    const newStudent = {
-      id: Date.now(),
-      name: '',
-      email: '',
-    };
-    setStudents([...students, newStudent]);
-    setEditingStudent(newStudent);
-  };
-
-  const handleEditStudent = (student) => {
-    setEditingStudent(student);
-  };
-
-  const handleDeleteStudent = (studentId) => {
-    setStudents(students.filter(student => student.id !== studentId));
-  };
-
-  const handleSaveStudent = (studentId, updatedStudent) => {
-    setStudents(
-      students.map(student =>
-        student.id === studentId ? updatedStudent : student
-      )
-    );
-    setEditingStudent(null);
-
-    // Send email notification to the student
-    if (updatedStudent.email) {
-      sendEmailNotification(updatedStudent.email, updatedStudent.name);
+  // Add a new teacher
+  const handleAddTeacher = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch('http://127.0.0.1:5555/teachers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newTeacher),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to add teacher');
+      }
+      const createdTeacher = await response.json();
+      setTeachers([...teachers, createdTeacher]);
+      setNewTeacher({ name: '', user_id: '' });
+    } catch (error) {
+      console.error('Error adding teacher:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleCancelEdit = () => {
-    setEditingStudent(null);
+  // Edit teacher
+  const handleEditTeacher = (teacher) => {
+    setEditingTeacher({ ...teacher });
   };
 
-  // Function to send email using EmailJS
+  // Save updated teacher
+  const handleSaveTeacher = async (teacherId, updatedTeacher) => {
+    setLoading(true);
+    try {
+      const response = await fetch(`http://127.0.0.1:5555/teachers/${teacherId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedTeacher),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to update teacher');
+      }
+      const updatedData = await response.json();
+      setTeachers(teachers.map(teacher => 
+        teacher.id === teacherId ? updatedData : teacher
+      ));
+      setEditingTeacher(null);
+
+      // Send email notification (optional)
+      if (updatedTeacher.email) {
+        sendEmailNotification(updatedTeacher.email, updatedTeacher.name);
+      }
+    } catch (error) {
+      console.error('Error updating teacher:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Cancel editing
+  const handleCancelEdit = () => {
+    setEditingTeacher(null);
+  };
+
+  // Delete teacher
+  const handleDeleteTeacher = async (teacherId) => {
+    setLoading(true);
+    try {
+      const response = await fetch(`http://127.0.0.1:5555/teachers/${teacherId}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        throw new Error('Failed to delete teacher');
+      }
+      setTeachers(teachers.filter(teacher => teacher.id !== teacherId));
+    } catch (error) {
+      console.error('Error deleting teacher:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle input changes for new teacher
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setNewTeacher(prevState => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
+
+  // Send email notification
   const sendEmailNotification = (email, name) => {
     const serviceId = 'your_service_id';
     const templateId = 'your_template_id';
     const userId = 'your_user_id';
-
     const templateParams = {
       to_name: name,
       to_email: email,
-      message: `Dear ${name}, you have been successfully added to the Study Sphere platform as a student. Welcome aboard!`,
+      message: `Dear ${name}, you have been successfully added to the Study Sphere platform as a teacher. Welcome aboard!`,
     };
 
     emailjs.send(serviceId, templateId, templateParams, userId)
@@ -86,15 +140,34 @@ const ManageStudents = () => {
 
   return (
     <div className="max-w-6xl mx-auto p-4 bg-white rounded-lg shadow-lg">
-      <h1 className="text-3xl font-bold mb-6 text-center">Manage Students</h1>
+      <h1 className="text-3xl font-bold mb-6 text-center">Manage Teachers</h1>
+
       <div className="mb-4">
+        <h2 className="text-2xl font-bold mb-2">Add Teacher</h2>
+        <input
+          type="text"
+          name="name"
+          value={newTeacher.name}
+          onChange={handleInputChange}
+          placeholder="Name"
+          className="border border-gray-300 p-2 rounded-lg mr-2"
+        />
+        <input
+          type="text"
+          name="user_id"
+          value={newTeacher.user_id}
+          onChange={handleInputChange}
+          placeholder="User ID"
+          className="border border-gray-300 p-2 rounded-lg mr-2"
+        />
         <button
-          onClick={handleAddStudent}
+          onClick={handleAddTeacher}
           className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600"
         >
-          Add Student
+          Add Teacher
         </button>
       </div>
+
       {loading ? (
         <div className="flex justify-center items-center h-64">
           <TailSpin color="blue" radius="8px" width={50} height={50} />
@@ -105,47 +178,47 @@ const ManageStudents = () => {
             <tr>
               <th className="py-2 px-4 border-b">ID</th>
               <th className="py-2 px-4 border-b">Name</th>
-              <th className="py-2 px-4 border-b">Email</th>
+              <th className="py-2 px-4 border-b">User ID</th>
               <th className="py-2 px-4 border-b">Actions</th>
             </tr>
           </thead>
           <tbody>
-            {students.map(student => (
-              <tr key={student.id} className="border-t">
-                <td className="py-2 px-4 border-r">{student.id}</td>
+            {teachers.map(teacher => (
+              <tr key={teacher.id} className="border-t">
+                <td className="py-2 px-4 border-r">{teacher.id}</td>
                 <td className="py-2 px-4 border-r">
-                  {editingStudent?.id === student.id ? (
+                  {editingTeacher?.id === teacher.id ? (
                     <input
                       type="text"
-                      value={editingStudent.name}
+                      value={editingTeacher.name}
                       onChange={(e) =>
-                        setEditingStudent({ ...editingStudent, name: e.target.value })
+                        setEditingTeacher({ ...editingTeacher, name: e.target.value })
                       }
                       className="w-full p-2 border border-gray-300 rounded-lg"
                     />
                   ) : (
-                    student.name
+                    teacher.name
                   )}
                 </td>
                 <td className="py-2 px-4 border-r">
-                  {editingStudent?.id === student.id ? (
+                  {editingTeacher?.id === teacher.id ? (
                     <input
-                      type="email"
-                      value={editingStudent.email}
+                      type="text"
+                      value={editingTeacher.user_id || ''}
                       onChange={(e) =>
-                        setEditingStudent({ ...editingStudent, email: e.target.value })
+                        setEditingTeacher({ ...editingTeacher, user_id: e.target.value })
                       }
                       className="w-full p-2 border border-gray-300 rounded-lg"
                     />
                   ) : (
-                    student.email
+                    teacher.user_id
                   )}
                 </td>
                 <td className="py-2 px-4">
-                  {editingStudent?.id === student.id ? (
+                  {editingTeacher?.id === teacher.id ? (
                     <div className="flex space-x-2">
                       <button
-                        onClick={() => handleSaveStudent(student.id, editingStudent)}
+                        onClick={() => handleSaveTeacher(teacher.id, editingTeacher)}
                         className="bg-green-500 text-white px-4 py-2 rounded-lg shadow hover:bg-green-600"
                       >
                         <FaSave />
@@ -160,13 +233,13 @@ const ManageStudents = () => {
                   ) : (
                     <div className="flex space-x-2">
                       <button
-                        onClick={() => handleEditStudent(student)}
+                        onClick={() => handleEditTeacher(teacher)}
                         className="bg-yellow-500 text-white px-4 py-2 rounded-lg shadow hover:bg-yellow-600"
                       >
                         <FaEdit />
                       </button>
                       <button
-                        onClick={() => handleDeleteStudent(student.id)}
+                        onClick={() => handleDeleteTeacher(teacher.id)}
                         className="bg-red-500 text-white px-4 py-2 rounded-lg shadow hover:bg-red-600"
                       >
                         <FaTrashAlt />
@@ -183,4 +256,5 @@ const ManageStudents = () => {
   );
 };
 
-export default ManageStudents;
+export default ManageTeachers;
+

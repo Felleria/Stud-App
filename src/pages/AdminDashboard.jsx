@@ -1,36 +1,9 @@
-/*import Sidebar from '../components/Sidebar';
-import { Outlet } from 'react-router-dom';
-
-
-
-const adminLinks = [
-  { name: 'Manage Students', path: 'manage-students' },
-  { name: 'Manage Teachers', path: 'manage-teachers' },
-  { name: 'Manage Classes', path: 'manage-classes' },
-  { name: 'Assigned Teachers', path: 'assigned-teachers' },
-  { name: 'Reports', path: 'reports' },
-];
-
-const AdminDashboard = () => {
-  return (
-    <div className="flex">
-      <Sidebar links={adminLinks} />
-      <div className="flex-1 p-6 bg-gray-100">
-        <Outlet />
-      </div>
-    </div>
-  );
-};
-
-export default AdminDashboard;
-*/
-
-// src/pages/AdminDashboard.jsx
 import { Link, Routes, Route } from 'react-router-dom';
 import ManageStudents from '../components/admin/ManageStudents';
 import ManageTeachers from '../components/admin/ManageTeachers';
+import ManageCourses from '../components/admin/ManageCourses';
 import ManageClasses from '../components/admin/ManageClasses';
-/*import AssignedTeachers from '../components/admin/AssignedTeachers';*/
+//import AssignedTeachers from '../components/admin/AssignedTeachers';
 import Reports from '../components/admin/Reports';
 
 const AdminDashboard = () => {
@@ -46,6 +19,9 @@ const AdminDashboard = () => {
               <Link to="manage-teachers" className="hover:text-gray-300">Manage Teachers</Link>
             </li>
             <li>
+              <Link to="manage-courses" className="hover:text-gray-300">Manage Courses</Link>
+            </li>
+            <li>
               <Link to="manage-classes" className="hover:text-gray-300">Manage Classes</Link>
             </li>
             <li>
@@ -58,6 +34,7 @@ const AdminDashboard = () => {
         <Routes>
           <Route path="manage-students" element={<ManageStudents />} />
           <Route path="manage-teachers" element={<ManageTeachers />} />
+          <Route path="manage-courses" element={<ManageCourses />} />
           <Route path="manage-classes" element={<ManageClasses />} />
           <Route path="reports" element={<Reports />} />
         </Routes>

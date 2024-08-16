@@ -12,7 +12,6 @@ const ManageStudents = () => {
     try {
       setLoading(true);
       const response = await fetch('http://127.0.0.1:5555/students');
-      if (!response.ok) throw new Error('Failed to fetch students');
       const data = await response.json();
       setStudents(Array.isArray(data) ? data : []);
     } catch (error) {
@@ -29,9 +28,12 @@ const ManageStudents = () => {
 
   const handleAddStudent = () => {
     const newStudent = {
-      id: Date.now(),
+      student_id: Date.now(),
       name: '',
-      email: '',
+      enrollment_date: '',
+      date_of_birth: '',
+      gender: '',
+      phone_number: '',
     };
     setStudents([...students, newStudent]);
     setEditingStudent(newStudent);
@@ -48,7 +50,7 @@ const ManageStudents = () => {
         method: 'DELETE',
       });
       if (response.ok) {
-        setStudents(students.filter(student => student.id !== studentId));
+        setStudents(students.filter(student => student.student_id !== studentId));
       } else {
         console.error('Failed to delete student');
       }
@@ -70,9 +72,10 @@ const ManageStudents = () => {
         body: JSON.stringify(updatedStudent),
       });
       if (response.ok) {
+        const updatedData = await response.json();
         setStudents(
           students.map(student =>
-            student.id === studentId ? updatedStudent : student
+            student.student_id === studentId ? updatedData : student
           )
         );
         setEditingStudent(null);
@@ -133,18 +136,21 @@ const ManageStudents = () => {
         <table className="min-w-full bg-white border border-gray-300 rounded-lg">
           <thead>
             <tr>
-              <th className="py-2 px-4 border-b">ID</th>
+              <th className="py-2 px-4 border-b">Student ID</th>
               <th className="py-2 px-4 border-b">Name</th>
-              <th className="py-2 px-4 border-b">Email</th>
+              <th className="py-2 px-4 border-b">Enrollment Date</th>
+              <th className="py-2 px-4 border-b">Date of Birth</th>
+              <th className="py-2 px-4 border-b">Gender</th>
+              <th className="py-2 px-4 border-b">Phone Number</th>
               <th className="py-2 px-4 border-b">Actions</th>
             </tr>
           </thead>
           <tbody>
             {students.map(student => (
-              <tr key={student.id} className="border-t">
-                <td className="py-2 px-4 border-r">{student.id}</td>
+              <tr key={student.student_id} className="border-t">
+                <td className="py-2 px-4 border-r">{student.student_id}</td>
                 <td className="py-2 px-4 border-r">
-                  {editingStudent?.id === student.id ? (
+                  {editingStudent?.student_id === student.student_id ? (
                     <input
                       type="text"
                       value={editingStudent.name}
@@ -158,24 +164,66 @@ const ManageStudents = () => {
                   )}
                 </td>
                 <td className="py-2 px-4 border-r">
-                  {editingStudent?.id === student.id ? (
+                  {editingStudent?.student_id === student.student_id ? (
                     <input
-                      type="email"
-                      value={editingStudent.email}
+                      type="date"
+                      value={editingStudent.enrollment_date}
                       onChange={(e) =>
-                        setEditingStudent({ ...editingStudent, email: e.target.value })
+                        setEditingStudent({ ...editingStudent, enrollment_date: e.target.value })
                       }
                       className="w-full p-2 border border-gray-300 rounded-lg"
                     />
                   ) : (
-                    student.email
+                    student.enrollment_date
+                  )}
+                </td>
+                <td className="py-2 px-4 border-r">
+                  {editingStudent?.student_id === student.student_id ? (
+                    <input
+                      type="date"
+                      value={editingStudent.date_of_birth}
+                      onChange={(e) =>
+                        setEditingStudent({ ...editingStudent, date_of_birth: e.target.value })
+                      }
+                      className="w-full p-2 border border-gray-300 rounded-lg"
+                    />
+                  ) : (
+                    student.date_of_birth
+                  )}
+                </td>
+                <td className="py-2 px-4 border-r">
+                  {editingStudent?.student_id === student.student_id ? (
+                    <input
+                      type="text"
+                      value={editingStudent.gender}
+                      onChange={(e) =>
+                        setEditingStudent({ ...editingStudent, gender: e.target.value })
+                      }
+                      className="w-full p-2 border border-gray-300 rounded-lg"
+                    />
+                  ) : (
+                    student.gender
+                  )}
+                </td>
+                <td className="py-2 px-4 border-r">
+                  {editingStudent?.student_id === student.student_id ? (
+                    <input
+                      type="text"
+                      value={editingStudent.phone_number}
+                      onChange={(e) =>
+                        setEditingStudent({ ...editingStudent, phone_number: e.target.value })
+                      }
+                      className="w-full p-2 border border-gray-300 rounded-lg"
+                    />
+                  ) : (
+                    student.phone_number
                   )}
                 </td>
                 <td className="py-2 px-4">
-                  {editingStudent?.id === student.id ? (
+                  {editingStudent?.student_id === student.student_id ? (
                     <div className="flex space-x-2">
                       <button
-                        onClick={() => handleSaveStudent(student.id, editingStudent)}
+                        onClick={() => handleSaveStudent(student.student_id, editingStudent)}
                         className="bg-green-500 text-white px-4 py-2 rounded-lg shadow hover:bg-green-600"
                       >
                         <FaSave />
@@ -196,7 +244,7 @@ const ManageStudents = () => {
                         <FaEdit />
                       </button>
                       <button
-                        onClick={() => handleDeleteStudent(student.id)}
+                        onClick={() => handleDeleteStudent(student.student_id)}
                         className="bg-red-500 text-white px-4 py-2 rounded-lg shadow hover:bg-red-600"
                       >
                         <FaTrashAlt />
@@ -214,3 +262,4 @@ const ManageStudents = () => {
 };
 
 export default ManageStudents;
+

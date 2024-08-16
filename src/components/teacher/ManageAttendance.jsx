@@ -4,15 +4,26 @@ const ManageAttendance = () => {
   const [courses, setCourses] = useState([]);
   const [students, setStudents] = useState([]);
   const [selectedCourse, setSelectedCourse] = useState(null);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastVisible, setToastVisible] = useState(false);
 
   useEffect(() => {
     fetch('http://127.0.0.1:5555/courses')
-      .then(response => response.json())
+      .then(response => {
+        console.log('Response status:', response.status);
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
       .then(data => {
-        if (data && data.courses && Array.isArray(data.courses)) {
+        console.log('Fetched courses data:', data);
+        if (data && Array.isArray(data)) {
+          setCourses(data);
+        } else if (data && data.courses && Array.isArray(data.courses)) {
           setCourses(data.courses);
         } else {
-          console.error('Invalid response data:', data);
+          console.error('Unexpected data structure:', data);
         }
       })
       .catch(error => console.error('Error fetching courses:', error));
@@ -21,11 +32,13 @@ const ManageAttendance = () => {
   const handleCourseSelect = (event) => {
     const courseId = event.target.value;
     setSelectedCourse(courseId);
+
     fetch(`http://127.0.0.1:5555/students`)
       .then(response => response.json())
       .then(data => {
+        console.log('Fetched students data:', data);
         if (data && data.students && Array.isArray(data.students)) {
-          setStudents(data.students);
+          setStudents(data.students.filter(student => student.course_id === parseInt(courseId)));
         } else {
           console.error('Invalid response data:', data);
         }
@@ -35,27 +48,39 @@ const ManageAttendance = () => {
 
   const handleAttendanceChange = (studentId, isPresent) => {
     const student = students.find(student => student.id === studentId);
-    fetch(`http://127.0.0.1:5555/attendances/${studentId}`, {
-      method: 'PUT',
+    const attendanceData = {
+      student_id: studentId,
+      course_id: selectedCourse,
+      status: isPresent ? 'Present' : 'Absent',
+      date: new Date().toISOString().split('T')[0]
+    };
+
+    fetch(`http://127.0.0.1:5555/attendances`, {
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ status: isPresent ? 'Present' : 'Absent' }),
+      body: JSON.stringify(attendanceData),
     })
-    .then(response => {
-      if (!response.ok) {
-        return response.text().then(text => { throw new Error(text) });
-      }
-      return response.json();
-    })
-    .then(updatedAttendance => {
-      console.log('Attendance updated:', updatedAttendance);
-      setStudents(students.map(student => 
-        student.id === studentId ? { ...student, isPresent } : student
-      ));
-      alert(`${student.name} is ${isPresent ? 'Present' : 'Absent'}`);
-    })
-    .catch(error => console.error('Error updating attendance:', error));
+      .then(response => {
+        if (!response.ok) {
+          return response.text().then(text => { throw new Error(text) });
+        }
+        return response.json();
+      })
+      .then(updatedAttendance => {
+        console.log('Attendance updated:', updatedAttendance);
+        setStudents(students.map(student =>
+          student.id === studentId ? { ...student, isPresent } : student
+        ));
+        setToastMessage(`${student.name} is marked as ${isPresent ? 'Present' : 'Absent'}`);
+        setToastVisible(true);
+        // Hide toast after 1 second
+        setTimeout(() => {
+          setToastVisible(false);
+        }, 1000);
+      })
+      .catch(error => console.error('Error updating attendance:', error));
   };
 
   return (
@@ -111,6 +136,12 @@ const ManageAttendance = () => {
               ))}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {toastVisible && (
+        <div className="fixed bottom-4 right-4 bg-blue-500 text-white p-3 rounded-lg shadow-lg">
+          <p>{toastMessage}</p>
         </div>
       )}
     </div>
